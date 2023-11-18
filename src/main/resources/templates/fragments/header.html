@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+    <link th:href="@{/css/layout.css}" rel="stylesheet"/>
+    <title>SMSF AVT</title>
+</head>
+
+<body>
+<div id="container">
+    <!-- content -->
+    <div id="header">
+        <div class="util_area">
+            <div class="layout">
+                <h1>SMSF AVT</h1>
+                <ul class="util_menu_list">
+                    <li>
+                        <span class="txt">
+                            환영합니다.
+                        </span>
+                    </li>
+                    <li>
+                        <span class="bar">I</span>
+                        <span>내정보보기</span>
+                    </li>
+                    <li>
+                        <span class="bar">I</span>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="menu_area">
+        <div class="layout">
+            <h1 class="h1_logo">
+                <a href="/smsfai" class="sp_com">KT SMSF</a>
+            </h1>
+            <!-- gnb -->
+            <div id="gnb">
+                <ul class="gnb_list">
+                        <li><a href="/classification/classify"><span>시나리오 조회</span></a></li>
+
+                        <li><a href="/spamout2/classify"><span>패키지(PKG) 조회</span></a></li>
+
+                        <li><a href="/verification/verify"><span>시나리오 생성</span></a></li>
+
+                        <li><a href="/verification/verify"><span>패키지(PKG) 생성</span></a></li>
+
+                        <li><a href="/management/noticemanagement/list"><span>공지사항</span></a></li>
+                </ul>
+            </div>
+            <!-- //gnb -->
+        </div>
+    </div>
+</div>
+<!-- //container -->
+</body>
+</html>
