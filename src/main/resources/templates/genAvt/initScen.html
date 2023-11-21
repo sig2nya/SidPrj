@@ -10,10 +10,6 @@
             padding-top: 56px; /* Adjust this value based on your navbar height */
         }
 
-        .container {
-            max-height: 80vh;
-        }
-
         #fileSelect {
             height : auto;
             max-height : 80%;
@@ -21,6 +17,7 @@
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container-fluid">
@@ -49,52 +46,28 @@
             </div>
         </div>
     </nav>
-
     <div class="container mt-4">
-        <h1 class="mb-4">AVT Scenario Directory Contents</h1>
-        <ul class="list-group">
-            <!-- Iterate over the file list and display -->
-            <select id="fileSelect" multiple class="form-select mb-3" size="25">
-                <option th:each="file : ${files}" th:value="${file}" th:text="${file}"></option>
-            </select>
-        </ul>
+        <h1 class="mb-4">AVT Scenario Generator</h1>
 
-        <button class="btn btn-primary" onclick="handleRequest()">요청</button>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label for="xmlName">XML Name</label>
+                <input type="text" class="form-control" id="xmlName" placeholder="Enter XML Name">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="nodeTitle">Node Title</label>
+                <input type="text" class="form-control" id="nodeTitle" placeholder="Enter Node Title">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="description">Description</label>
+                <input type="text" class="form-control" id="description" placeholder="Enter Description">
+            </div>
+        </div>
+        <button class="btn btn-primary mt-3" onclick="initXML()">XML 생성 시작</button>
     </div>
-
     <script th:inline="javascript">
-        function handleRequest() {
-            var select = document.getElementById('fileSelect');
-            var selectedValues = [];
+        function initXML() {
 
-            for (var i = 0; i < select.options.length; i++) {
-                if (select.options[i].selected) {
-                    selectedValues.push(select.options[i].value);
-                }
-            }
-
-            var xhr = new XMLHttpRequest();
-
-            xhr.open('POST', '/validationRequest/scen', true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-
-            var requestData = JSON.stringify({
-                selectedValues : selectedValues
-            });
-
-            xhr.send(requestData);
-
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    if (xhr.status === 200) {
-                        console.log('서버 응답 : ', xhr.responseText);
-                    } else {
-                        console.error('서버 응답 오류 : ', xhr.status);
-                    }
-                }
-            };
-
-            console.log('Selected Value : ', selectedValues);
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

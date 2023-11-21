@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Directory List</title>
+    <style>
+        body {
+            padding-top: 56px; /* Adjust this value based on your navbar height */
+        }
+
+        #fileSelect {
+            height : auto;
+            max-height : 80%;
+            overflow-y : auto;
+        }
+    </style>
+</head>
+
+<body onload="updateLabels()">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">SMSF AVT</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/scenList">시나리오 조회 / 요청</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/pkgList">패키지(PKG) 조회 / 요청</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/initScen">시나리오 생성</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/initPkg">패키지(PKG) 생성</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/management/noticemanagement/list">공지사항</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h1 class="mb-4">AVT Scenario Generator</h1>
+
+        <div class="row">
+            <!-- Left column with select box -->
+            <div class="col-md-6">
+                <ul class="list-group">
+                    <!-- Iterate over the file list and display -->
+                    <select id="fileSelect" class="form-select mb-3" onchange="updateLabels()">
+                        <option th:each="ipcList : ${ipcList}" th:value="${ipcList}" th:text="${ipcList}"></option>
+                    </select>
+                </ul>
+
+                <ul class="list-group">
+                    <label for="textBox">XML 미리보기</label>
+                    <textarea id="textBox" class="form-control" rows="15" readonly></textarea>
+                </ul>
+            </div>
+
+            <div class="col-md-6" id="labelContainer">
+            </div>
+
+            <!-- Right column with text box -->
+            <button class="btn btn-primary mt-3" onclick="addNode()">IPC MSG(시나리오) 추가</button>
+            <button class="btn btn-primary mt-3" onclick="handleRequest()">시나리오 생성</button>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        function handleSelectChange() {
+            var select = document.getElementById('fileSelect');
+            var textBox = document.getElementById('textBox');
+
+            var selectedValues = [];
+            for (var i = 0; i < select.options.length; i++) {
+                if (select.options[i].selected) {
+                    selectedValues.push(select.options[i].value);
+                }
+            }
+
+            // 출력할 텍스트를 생성
+            var selectedText = selectedValues.join(', ');
+
+            // 텍스트 박스에 출력
+            textBox.value = selectedText;
+        }
+    </script>
+
+    <script th:inline="javascript">
+        function addNode() {
+            var containerDiv = document.getElementById('labelContainer');
+            var textBoxes = containerDiv.querySelectorAll('input[type="text"]');
+            var textBoxValues = [];
+
+            textBoxes.forEach(function(textBox) {
+                var value = textBox.value;
+                textBoxValues.push(value);
+            });
+
+            var xhr = new XMLHttpRequest();
+            var url = '/genScen/addScen';
+
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    console.log('Data Sent successfully');
+                }
+            };
+
+            var data = JSON.stringify({textBoxValues : textBoxValues});
+            xhr.send(data);
+
+            console.log("TextBox Values : ", textBoxValues);
+        }
+    </script>
+
+    <script th:inline="javascript">
+        function handleRequest() {
+            var select = document.getElementById('fileSelect');
+            var selectedValues = [];
+
+            for (var i = 0; i < select.options.length; i++) {
+                if (select.options[i].selected) {
+                    selectedValues.push(select.options[i].value);
+                }
+            }
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('POST', '/validationRequest/pkg', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            var requestData = JSON.stringify({
+                selectedValues : selectedValues
+            });
+
+            xhr.send(requestData);
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        consol.log('서버 응답 : ', xhr.responseText);
+                    } else {
+                        console.error('서버 응답 오류 : ', xhr.status);
+                    }
+                }
+            };
+
+            console.log('Selected Value : ', selectedValues);
+        }
+    </script>
+
+    <script th:inline="javascript">
+        function updateLabels() {
+                var selectedValue = document.getElementById('fileSelect').value;
+                var ipcMap = /*[[${ipcMap}]]*/ {};
+
+                // Find matching entry.value for selectedValue
+                var matchingValue = ipcMap[selectedValue];
+
+                // Clear previous labels
+                document.getElementById('labelContainer').innerHTML = "";
+
+                // Add labels for each element in matchingValue
+                matchingValue.forEach(function(element, index) {
+
+                // Create a new div to contain label and TextBox
+                var containerDiv = document.createElement("div");
+
+                // Create label
+                var label = document.createElement("label");
+                label.textContent = element;
+                label.style.display = "block";
+
+                // Create TextBox
+                var textBox = document.createElement("input");
+                textBox.type = "text";
+                textBox.value = "";
+
+                // Append label and TextBox to the container div
+                containerDiv.appendChild(label);
+                containerDiv.appendChild(textBox);
+
+                document.getElementById('labelContainer').appendChild(containerDiv);
+            });
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

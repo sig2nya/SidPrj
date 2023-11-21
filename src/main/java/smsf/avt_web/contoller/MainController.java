@@ -18,4 +18,9 @@ public class MainController {
     public String getIndexPage() {
         return "index";
     }
+
+    @GetMapping("/test")
+    public String getTestPage() {
+        return "test";
+    }
 }
