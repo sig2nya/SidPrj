@@ -70,12 +70,11 @@ public class XmlCreationController {
             scene.setDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
 
             FlowList flowList = new FlowList();
-            Flow flow = new Flow();
+//            Flow flow = new Flow();
             List<Flow> list = new ArrayList<>();
 
-            list.add(flow);
+//            list.add(flow);
             flowList.setFlows(list);
-
             scene.setFlowList(flowList);
 
             Marshaller marshaller = context.createMarshaller();
@@ -158,9 +157,9 @@ public class XmlCreationController {
             Flow flow = new Flow();
             FieldList fieldList = new FieldList();
             List<Field> list = new ArrayList<>();
-            List<Flow> tmpList = new ArrayList<>();
+            List<Flow> tmpList = flowList.getFlows();
 
-            flow.setId(flow.getId() + 1);
+            flow.setId(tmpList.size() + 1);
             flow.setMessage(data.get("IpcMsg"));
             flow.setRequester(data.get("Requester"));
             flow.setInterfaceName(data.get("Interface"));
