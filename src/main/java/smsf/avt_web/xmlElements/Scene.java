@@ -1,57 +1,52 @@
 package smsf.avt_web.xmlElements;
 
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
-
-@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "Scene")
 public class Scene {
+    @XmlElement(name = "ID")
     private int id;
+    @XmlElement(name = "Title")
     private String title;
+    @XmlElement(name = "Description")
     private String description;
-    private Date date;
-    private List<Flow> flow_list;
+    @XmlElement(name = "Create_Date")
+    private String date;
+    @XmlElement(name = "Flow_List")
+    private FlowList flow_list;
 
-    @XmlElement
-    public int getId() { return id; }
-
+    public int getId() {
+        return id;
+    }
     public void setId(int id) { this.id = id; }
 
-    @XmlElement
     public String getTitle() {
         return title;
     }
-
     public void setTitle(String title) {
         this.title = title;
     }
 
-    @XmlElement
+
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
     }
 
-    @XmlElement
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
-
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
-    @XmlElement
-    public List<Flow> getFlowList() {
+    public FlowList getFlow_list() {
         return flow_list;
     }
-
-    public void setFlowList(List<Flow> flow_list) {
+    public void setFlowList(FlowList flow_list) {
         this.flow_list = flow_list;
     }
 }

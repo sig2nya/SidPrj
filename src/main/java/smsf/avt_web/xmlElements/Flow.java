@@ -1,15 +1,22 @@
 package smsf.avt_web.xmlElements;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Flow {
+    @XmlElement(name = "ID")
     private int id;
+    @XmlElement(name = "Requester")
     private String requester;
-    private String interf;
+    @XmlElement(name = "Interface")
+    private String interfaceName;
+    @XmlElement(name = "Message")
     private String message;
+    @XmlElement(name = "Field_List")
     private FieldList field_list;
 
-    @XmlElement
     public int getId() {
         return id;
     }
@@ -18,16 +25,22 @@ public class Flow {
         this.id = id;
     }
 
-    @XmlElement
-    public String getInterf() {
-        return interf;
+    public String getRequester() {
+        return requester;
     }
 
-    public void setInterf(String interf) {
-        this.interf = interf;
+    public void setRequester(String requester) {
+        this.requester = requester;
     }
 
-    @XmlElement
+    public String getInterfaceName() {
+        return interfaceName;
+    }
+
+    public void setInterfaceName(String interfaceName) {
+        this.interfaceName = interfaceName;
+    }
+
     public String getMessage() {
         return message;
     }
@@ -36,7 +49,6 @@ public class Flow {
         this.message = message;
     }
 
-    @XmlElement
     public FieldList getFieldList() {
         return field_list;
     }

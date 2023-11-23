@@ -61,9 +61,28 @@
 
                 <ul class="list-group">
                     <label for="textBox">XML 미리보기</label>
-                    <textarea id="textBox" class="form-control" rows="15" readonly></textarea>
+                    <textarea id="textBox" class="form-control" rows="15" readonly th:text="${xmlContent}"></textarea>
                 </ul>
             </div>
+
+            <div class="col-md-6" id="requesterLabelContainer">
+                <!-- First additional select box for Requester -->
+                <ul class="list-group mb-3">
+                    <label for="requesterSelect">Requester</label>
+                    <select id="requesterSelect" class="form-select">
+                        <option th:each="requesterList : ${requesterList}" th:value="${requesterList}" th:text="${requesterList}"></option>
+                    </select>
+                </ul>
+
+                <!-- Second additional select box for Interface -->
+                <ul class="list-group">
+                    <label for="interfaceSelect">Interface</label>
+                    <select id="interfaceSelect" class="form-select">
+                        <option th:each="requesterList : ${requesterList}" th:value="${requesterList}" th:text="${requesterList}"></option>
+                    </select>
+                </ul>
+            </div>
+
 
             <div class="col-md-6" id="labelContainer">
             </div>
@@ -98,29 +117,66 @@
         function addNode() {
             var containerDiv = document.getElementById('labelContainer');
             var textBoxes = containerDiv.querySelectorAll('input[type="text"]');
-            var textBoxValues = [];
+            var selectedMsg = document.getElementById('fileSelect').value;
+            console.log(selectedMsg);
+            var requester = document.getElementById('requesterSelect').value;
+            console.log(requester);
+            var interface = document.getElementById('interfaceSelect').value;
+            console.log(interface);
+
+            var labelValuesMap = {};
+            labelValuesMap['IpcMsg'] = selectedMsg;
+            labelValuesMap['Requester'] = requester;
+            labelValuesMap['Interface'] = interface;
 
             textBoxes.forEach(function(textBox) {
-                var value = textBox.value;
-                textBoxValues.push(value);
+                var label = textBox.previousElementSibling.textContent.trim();
+                labelValuesMap[label] = textBox.value;
             });
 
             var xhr = new XMLHttpRequest();
-            var url = '/genScen/addScen';
+            var url = '/genScen';
 
             xhr.open('POST', url, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
 
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    console.log('Data Sent successfully');
+                    console.log('Data Sent successfully : ', labelValuesMap);
                 }
             };
 
-            var data = JSON.stringify({textBoxValues : textBoxValues});
+            var data = JSON.stringify(labelValuesMap);
             xhr.send(data);
 
-            console.log("TextBox Values : ", textBoxValues);
+            readXml();
+        }
+    </script>
+
+    <script>
+        function readXml() {
+            setInterval(function() {
+                var xhr = new XMLHttpRequest();
+                var url = '/readXml';
+
+                xhr.open('GET', url, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            var xmlContent = xhr.responseText;
+                            document.getElementById('textBox').value = xmlContent;
+                            console.log('XML Content : ', xmlContent);
+                        } else {
+                            console.error('Failed to read XML. Status : ', xhr.status);
+                        }
+                    }
+                };
+
+                xhr.send();
+                document.getElementById('textBox').innerText = xmlContent;
+            }, 5000);
         }
     </script>
 
@@ -155,8 +211,6 @@
                     }
                 }
             };
-
-            console.log('Selected Value : ', selectedValues);
         }
     </script>
 
