@@ -2,7 +2,10 @@ package smsf.avt_web.xmlElements;
 
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlValue;
 
+@XmlRootElement(name = "Field")
 public class Field {
     private String name;
     private String value;
@@ -16,7 +19,7 @@ public class Field {
         this.name = name;
     }
 
-    @XmlElement(name = "Field_Value")
+    @XmlValue
     public String getValue() {
         return value;
     }

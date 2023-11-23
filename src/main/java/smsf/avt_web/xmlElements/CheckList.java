@@ -7,7 +7,7 @@ import java.util.List;
 public class CheckList {
     private List<Check> checks;
 
-    @XmlElement(name = "Check_List")
+    @XmlElement(name = "Check")
     public List<Check> getChecks() {
         return checks;
     }

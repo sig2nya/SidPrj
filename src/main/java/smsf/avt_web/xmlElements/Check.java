@@ -1,15 +1,26 @@
 package smsf.avt_web.xmlElements;
 
+import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlValue;
 
+@XmlRootElement(name = "Check")
 public class Check {
+    private int id;
     private String name;
+    private int enable;
     private String value;
-    private int paramNum;
-    private String result;
-    private Param param;
 
-    @XmlElement(name = "Name")
+    @XmlAttribute(name = "ID")
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+    @XmlAttribute(name = "Name")
     public String getName() {
         return name;
     }
@@ -18,7 +29,16 @@ public class Check {
         this.name = name;
     }
 
-    @XmlElement(name = "Value")
+    @XmlAttribute(name = "ENABLE")
+    public int getEnable() {
+        return enable;
+    }
+
+    public void setEnable(int enable) {
+        this.enable = enable;
+    }
+
+    @XmlValue
     public String getValue() {
         return value;
     }
@@ -27,30 +47,4 @@ public class Check {
         this.value = value;
     }
 
-    @XmlElement(name = "ParamNum")
-    public int getParamNum() {
-        return paramNum;
-    }
-
-    public void setParamNum(int paramNum) {
-        this.paramNum = paramNum;
-    }
-
-    @XmlElement(name = "Result")
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    @XmlElement(name = "Param")
-    public Param getParam() {
-        return param;
-    }
-
-    public void setParam(Param param) {
-        this.param = param;
-    }
 }

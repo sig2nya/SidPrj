@@ -16,6 +16,8 @@ public class Scene {
     @XmlElement(name = "Flow_List")
     private FlowList flow_list;
 
+    @XmlElement(name = "Check_List")
+    private CheckList check_list;
     public int getId() {
         return id;
     }
@@ -48,5 +50,12 @@ public class Scene {
     }
     public void setFlowList(FlowList flow_list) {
         this.flow_list = flow_list;
+    }
+
+    public CheckList getCheck_list() {
+        return check_list;
+    }
+    public void setCheck_list(CheckList flow_list) {
+        this.check_list = check_list;
     }
 }

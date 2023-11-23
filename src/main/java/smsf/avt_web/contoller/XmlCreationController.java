@@ -152,14 +152,20 @@ public class XmlCreationController {
         try {
             Unmarshaller unmarshaller = context.createUnmarshaller();
             Marshaller marshaller = context.createMarshaller();
+
             Scene scene = (Scene) unmarshaller.unmarshal(xmlFile);
             FlowList flowList = scene.getFlow_list();
             Flow flow = new Flow();
-            FieldList fieldList = new FieldList();
-            List<Field> list = new ArrayList<>();
-            List<Flow> tmpList = flowList.getFlows();
 
-            flow.setId(tmpList.size() + 1);
+            FieldList fieldList = new FieldList();
+            CheckList checkList = new CheckList();
+
+            List<Field> fieldlist = new ArrayList<>();
+            List<Check> checklist = new ArrayList<>();
+
+            List<Flow> tmpFlowList = flowList.getFlows();
+
+            flow.setId(tmpFlowList.size() + 1);
             flow.setMessage(data.get("IpcMsg"));
             flow.setRequester(data.get("Requester"));
             flow.setInterfaceName(data.get("Interface"));
@@ -167,18 +173,40 @@ public class XmlCreationController {
             String keyTmp[] = data.keySet().toArray(new String[0]);
             String valueTmp[] = data.values().toArray(new String[0]);
 
-            for (int i = 3; i < keyTmp.length; i++) {
-                Field field = new Field();
-                field.setName(keyTmp[i]);
-                field.setValue(valueTmp[i]);
-                list.add(field);
-            }
+            if (data.get("IpcMsg").contains("_RES")) {
+                for (int i = 3; i < keyTmp.length; i++) {
+                    Check check = new Check();
+                    int id = keyTmp.length - 3;
+                    check.setName(keyTmp[i]);
+                    check.setId(id++);
+                    check.setEnable(1);
+                    check.setValue(valueTmp[i]);
+                    checklist.add(check);
+                }
 
-            fieldList.setFields(list);
-            flow.setFieldList(fieldList);
-            tmpList.add(flow);
-            flowList.setFlows(tmpList);
-            scene.setFlowList(flowList);
+                checkList.setChecks(checklist);
+                flow.setCheckList(checkList);
+                tmpFlowList.add(flow);
+                flowList.setFlows(tmpFlowList);
+                scene.setCheck_list(checkList);
+
+            } else if (data.get("IpcMsg").contains("_REQ")){
+                for (int i = 3; i < keyTmp.length; i++) {
+                    Field field = new Field();
+                    field.setName(keyTmp[i]);
+                    field.setValue(valueTmp[i]);
+                    fieldlist.add(field);
+                }
+
+                fieldList.setFields(fieldlist);
+                flow.setFieldList(fieldList);
+                tmpFlowList.add(flow);
+                flowList.setFlows(tmpFlowList);
+                scene.setFlowList(flowList);
+
+            } else {
+                System.out.println("Invalid IPC MSG!!!");
+            }
 
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             marshaller.marshal(scene, xmlFile);

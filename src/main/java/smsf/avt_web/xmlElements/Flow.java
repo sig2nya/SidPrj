@@ -17,6 +17,9 @@ public class Flow {
     @XmlElement(name = "Field_List")
     private FieldList field_list;
 
+    @XmlElement(name = "Check_List")
+    private CheckList check_list;
+
     public int getId() {
         return id;
     }
@@ -55,5 +58,13 @@ public class Flow {
 
     public void setFieldList(FieldList field_list) {
         this.field_list = field_list;
+    }
+
+    public CheckList getCheckList() {
+        return check_list;
+    }
+
+    public void setCheckList(CheckList check_list) {
+        this.check_list = check_list;
     }
 }
