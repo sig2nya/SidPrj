@@ -169,6 +169,7 @@ public class XmlCreationController {
     public static String createScen(@RequestBody Map<String, String> data, HttpSession session) {
         String xmlPath = (String) session.getAttribute("filePath");
         File xmlFile = new File(xmlPath);
+        int scriptIdx = 0;
 
         try {
             Unmarshaller unmarshaller = context.createUnmarshaller();
@@ -196,6 +197,11 @@ public class XmlCreationController {
 
             if (data.get("IpcMsg").contains("_RES")) {
                 for (int i = 3; i < keyTmp.length; i++) {
+                    if (data.get("ScriptInput").equals("0")) {
+                        scriptIdx = i;
+                        break;
+                    }
+
                     Check check = new Check();
                     int id = keyTmp.length - 3;
                     check.setName(keyTmp[i]);
@@ -213,6 +219,11 @@ public class XmlCreationController {
 
             } else if (data.get("IpcMsg").contains("_REQ")){
                 for (int i = 3; i < keyTmp.length; i++) {
+                    if (data.get("ScriptInput").equals("0")) {
+                        scriptIdx = i;
+                        break;
+                    }
+
                     Field field = new Field();
                     field.setName(keyTmp[i]);
                     field.setValue(valueTmp[i]);

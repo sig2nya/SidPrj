@@ -130,6 +130,7 @@
             var interface = document.getElementById('interfaceSelect').value;
 
             var labelValuesMap = {};
+
             labelValuesMap['IpcMsg'] = selectedMsg;
             labelValuesMap['Requester'] = requester;
             labelValuesMap['Interface'] = interface;
@@ -139,9 +140,12 @@
                 labelValuesMap[label] = textBox.value;
             });
 
+            labelValuesMap['ScriptInput'] = '0';
+
             script.forEach(function(textBox) {
                 var label = textBox.previousElementSibling.textContent.trim();
                 labelValuesMap[label] = textBox.value;
+                labelValuesMap['ScriptInput'] = '1';
             });
 
             var xhr = new XMLHttpRequest();
