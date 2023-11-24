@@ -9,16 +9,10 @@
         body {
             padding-top: 56px; /* Adjust this value based on your navbar height */
         }
-
-        #fileSelect {
-            height : auto;
-            max-height : 80%;
-            overflow-y : auto;
-        }
     </style>
 </head>
 
-<body onload="updateLabels()">
+<body onload="updateIPCLabels()">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">SMSF AVT</a>
@@ -54,7 +48,7 @@
             <div class="col-md-6">
                 <ul class="list-group">
                     <!-- Iterate over the file list and display -->
-                    <select id="fileSelect" class="form-select mb-3" onchange="updateLabels()">
+                    <select id="ipcSelect" class="form-select mb-3" onchange="updateIPCLabels()">
                         <option th:each="ipcList : ${ipcList}" th:value="${ipcList}" th:text="${ipcList}"></option>
                     </select>
                 </ul>
@@ -81,23 +75,22 @@
                         <option th:each="requesterList : ${requesterList}" th:value="${requesterList}" th:text="${requesterList}"></option>
                     </select>
                 </ul>
+
+                <!-- Second additional select box for Interface -->
+                <ul class="list-group">
+                    <label for="scriptSelect">Script</label>
+                    <select id="scriptSelect" class="form-select" onchange="updateScriptLabels()">
+                        <option th:each="scriptList : ${scriptList}" th:value="${scriptList}" th:text="${scriptList}"></option>
+                    </select>
+                </ul>
+
                 <div class="row">
                     <div class="col-md-6 mb-2">
-                        <label for="scriptFieldContainer">Field Parameter</label>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label for="scriptCheckContainer">Check Parameter</label>
+                        <label for="scriptContainer">Script Parameter</label>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6 mb-2">
-                        <li id="scriptFieldContainer">
-                        </li>
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <li id="scriptCheckContainer">
-                        </li>
-                    </div>
+
+                <div class="col-md-6 mb-2" id="scriptContainer">
                 </div>
             </div>
 
@@ -107,38 +100,14 @@
             <!-- Right column with text box -->
             <button class="btn btn-primary mt-3" onclick="addNode()">IPC MSG(시나리오) 추가</button>
             <button class="btn btn-primary mt-3" onclick="handleRequest()">시나리오 생성</button>
-            <button class="btn btn-primary mt-3" id="addFieldButton">Script Field Parameter 추가</button>
-            <button class="btn btn-primary mt-3" id="delFieldButton">Script Field Parameter 삭제</button>
-            <button class="btn btn-primary mt-3" id="addCheckButton">Script Check Parameter 추가</button>
-            <button class="btn btn-primary mt-3" id="delCheckButton">Script Check Parameter 삭제</button>
         </div>
     </div>
-
-    <script th:inline="javascript">
-        function handleSelectChange() {
-            var select = document.getElementById('fileSelect');
-            var textBox = document.getElementById('textBox');
-
-            var selectedValues = [];
-            for (var i = 0; i < select.options.length; i++) {
-                if (select.options[i].selected) {
-                    selectedValues.push(select.options[i].value);
-                }
-            }
-
-            // 출력할 텍스트를 생성
-            var selectedText = selectedValues.join(', ');
-
-            // 텍스트 박스에 출력
-            textBox.value = selectedText;
-        }
-    </script>
 
     <script th:inline="javascript">
         function addNode() {
             var containerDiv = document.getElementById('labelContainer');
             var textBoxes = containerDiv.querySelectorAll('input[type="text"]');
-            var selectedMsg = document.getElementById('fileSelect').value;
+            var selectedMsg = document.getElementById('ipcSelect').value;
             var requester = document.getElementById('requesterSelect').value;
             var interface = document.getElementById('interfaceSelect').value;
 
@@ -196,7 +165,7 @@
 
     <script th:inline="javascript">
         function handleRequest() {
-            var select = document.getElementById('fileSelect');
+            var select = document.getElementById('ipcSelect');
             var selectedValues = [];
 
             for (var i = 0; i < select.options.length; i++) {
@@ -229,8 +198,8 @@
     </script>
 
     <script th:inline="javascript">
-        function updateLabels() {
-                var selectedValue = document.getElementById('fileSelect').value;
+        function updateIPCLabels() {
+                var selectedValue = document.getElementById('ipcSelect').value;
                 var ipcMap = /*[[${ipcMap}]]*/ {};
 
                 // Find matching entry.value for selectedValue
@@ -264,123 +233,33 @@
         }
     </script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // 추가 버튼 클릭 시 이벤트 처리
-            var addFieldButton = document.getElementById("addFieldButton");
-            addFieldButton.addEventListener("click", function () {
-                var requesterSelect = document.getElementById('requesterSelect');
-                if (requesterSelect.value != 'SCRIPT') {
-                    console.log('Only can add Field / Check Box when chosen SCRIPT');
-                    return;
-                }
-                // 현재 labelContainer에 있는 텍스트 박스의 개수 확인
-                var textBoxCount = document.querySelectorAll("#scriptFieldContainer input").length;
+    <script th:inline="javascript">
+        function updateScriptLabels() {
+                var selectedValue = document.getElementById('scriptSelect').value;
+                var scriptMap = /*[[${scriptMap}]]*/ {};
 
-                if (textBoxCount === 5) {
-                    console.error("Maximum Script Field Parameter");
-                    return;
-                }
+                var matchingValue = scriptMap[selectedValue];
 
-                // 새로운 레이블 및 텍스트 박스 추가
-                var labelText = "PARAM" + (textBoxCount + 1);
-                var label = document.createElement("label");
-                label.textContent = labelText;
+                document.getElementById('scriptContainer').innerHTML = "";
 
-                var textBox = document.createElement("input");
-                textBox.type = "text";
-                textBox.className = "form-control mb-2";
-                textBox.placeholder = labelText;
+                matchingValue.forEach(function(element, index) {
+                    var containerDiv = document.createElement("div");
 
-                var labelContainer = document.getElementById("scriptFieldContainer");
-                labelContainer.appendChild(label);
-                labelContainer.appendChild(textBox);
-            });
-        });
+                    var label = document.createElement("label");
+                    label.textContent = element;
+                    label.style.display = "block";
+
+                    var textBox = document.createElement("input");
+                    textBox.type = "text";
+                    textBox.value = "";
+
+                    containerDiv.appendChild(label);
+                    containerDiv.appendChild(textBox);
+
+                    document.getElementById('scriptContainer').appendChild(containerDiv);
+                });
+        }
     </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // 삭제 버튼 클릭 시 이벤트 처리
-            var delFieldButton = document.getElementById("delFieldButton");
-            delFieldButton.addEventListener("click", function () {
-                // 현재 labelContainer에 있는 텍스트 박스의 개수 확인
-                var textBoxCount = document.querySelectorAll("#scriptFieldContainer input").length;
-
-                // 마지막으로 추가된 label과 textBox 찾아서 삭제
-                var labelContainer = document.getElementById("scriptFieldContainer");
-                var lastLabel = labelContainer.lastElementChild;
-                var lastTextBox = labelContainer.lastElementChild.previousElementSibling;
-
-                if (lastLabel && lastTextBox) {
-                    labelContainer.removeChild(lastLabel);
-                    labelContainer.removeChild(lastTextBox);
-                } else {
-                    console.error("No elements to delete");
-                }
-            });
-        });
-    </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var interfaceSelect = document.getElementById('interfaceSelect');
-            if (interfaceSelect.value != 'SCRIPT') {
-                console.log('Only can add Field / Check Box when chosen SCRIPT');
-                return;
-            }
-
-            // 추가 버튼 클릭 시 이벤트 처리
-            var addCheckButton = document.getElementById("addCheckButton");
-            addCheckButton.addEventListener("click", function () {
-            // 현재 labelContainer에 있는 텍스트 박스의 개수 확인
-            var textBoxCount = document.querySelectorAll("#scriptCheckContainer input").length;
-
-            if (textBoxCount === 5) {
-                console.error("Maximum Script Check Parameter");
-                return;
-            }
-
-            // 새로운 레이블 및 텍스트 박스 추가
-            var labelText = "PARAM" + (textBoxCount + 1);
-            var label = document.createElement("label");
-            label.textContent = labelText;
-
-            var textBox = document.createElement("input");
-            textBox.type = "text";
-            textBox.className = "form-control mb-2";
-            textBox.placeholder = labelText;
-
-            var labelContainer = document.getElementById("scriptCheckContainer");
-            labelContainer.appendChild(label);
-            labelContainer.appendChild(textBox);
-            });
-        });
-    </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // 삭제 버튼 클릭 시 이벤트 처리
-            var delCheckButton = document.getElementById("delCheckButton");
-            delCheckButton.addEventListener("click", function () {
-                // 현재 labelContainer에 있는 텍스트 박스의 개수 확인
-                var textBoxCount = document.querySelectorAll("#scriptCheckContainer input").length;
-
-                // 마지막으로 추가된 label과 textBox 찾아서 삭제
-                var labelContainer = document.getElementById("scriptCheckContainer");
-                var lastLabel = labelContainer.lastElementChild;
-                var lastTextBox = labelContainer.lastElementChild.previousElementSibling;
-
-                if (lastLabel && lastTextBox) {
-                    labelContainer.removeChild(lastLabel);
-                    labelContainer.removeChild(lastTextBox);
-                } else {
-                    console.error("No elements to delete");
-                }
-            });
-        });
-    </script>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

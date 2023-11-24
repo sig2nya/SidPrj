@@ -41,6 +41,9 @@ public class XmlCreationController {
     @Value("${requester.path}")
     private String requesterPath;
 
+    @Value("${script.path}")
+    private String scriptPath;
+
     @Autowired
     private WebRequest webRequest;
 
@@ -70,10 +73,8 @@ public class XmlCreationController {
             scene.setDate(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")));
 
             FlowList flowList = new FlowList();
-//            Flow flow = new Flow();
             List<Flow> list = new ArrayList<>();
 
-//            list.add(flow);
             flowList.setFlows(list);
             scene.setFlowList(flowList);
 
@@ -99,6 +100,7 @@ public class XmlCreationController {
     public String genScen(Model model, HttpSession session) {
         ArrayList<String> ipcList = new ArrayList<>();
         ArrayList<String> requesterList = new ArrayList<>();
+        ArrayList<String> scriptList = new ArrayList<>();
 
         // for ipcList
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(ipcPath), StandardCharsets.UTF_8)) {
@@ -133,6 +135,24 @@ public class XmlCreationController {
             e.printStackTrace();
         }
 
+        // for scriptList
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(scriptPath), StandardCharsets.UTF_8)) {
+            String line;
+            HashMap<String, List<String>> scriptMap = new HashMap<>();
+
+            while ((line = reader.readLine()) != null) {
+                String tmp[] = line.split("\\s+");
+                if (line == "") continue;
+                scriptList.add(tmp[0]);
+
+                List<String> values = Arrays.asList(Arrays.copyOfRange(tmp, 1, tmp.length));
+                scriptMap.put(tmp[0], values);
+                model.addAttribute("scriptMap", scriptMap);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         try {
             String xmlContent = new String(Files.readAllBytes(Paths.get((String) session.getAttribute("filePath"))));
             model.addAttribute("xmlContent", xmlContent);
@@ -141,6 +161,7 @@ public class XmlCreationController {
         }
         model.addAttribute("webRequest", webRequest);
         model.addAttribute("ipcList", ipcList);
+        model.addAttribute("scriptList", scriptList);
         return "genAvt/genScen";
     }
 
