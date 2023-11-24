@@ -81,15 +81,36 @@
                         <option th:each="requesterList : ${requesterList}" th:value="${requesterList}" th:text="${requesterList}"></option>
                     </select>
                 </ul>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label for="scriptFieldContainer">Field Parameter</label>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label for="scriptCheckContainer">Check Parameter</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <li id="scriptFieldContainer">
+                        </li>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <li id="scriptCheckContainer">
+                        </li>
+                    </div>
+                </div>
             </div>
 
-
-            <div class="col-md-6" id="labelContainer">
+            <div class="col-md-6 mb-2" id="labelContainer">
             </div>
 
             <!-- Right column with text box -->
             <button class="btn btn-primary mt-3" onclick="addNode()">IPC MSG(시나리오) 추가</button>
             <button class="btn btn-primary mt-3" onclick="handleRequest()">시나리오 생성</button>
+            <button class="btn btn-primary mt-3" id="addFieldButton">Script Field Parameter 추가</button>
+            <button class="btn btn-primary mt-3" id="delFieldButton">Script Field Parameter 삭제</button>
+            <button class="btn btn-primary mt-3" id="addCheckButton">Script Check Parameter 추가</button>
+            <button class="btn btn-primary mt-3" id="delCheckButton">Script Check Parameter 삭제</button>
         </div>
     </div>
 
@@ -118,11 +139,8 @@
             var containerDiv = document.getElementById('labelContainer');
             var textBoxes = containerDiv.querySelectorAll('input[type="text"]');
             var selectedMsg = document.getElementById('fileSelect').value;
-            console.log(selectedMsg);
             var requester = document.getElementById('requesterSelect').value;
-            console.log(requester);
             var interface = document.getElementById('interfaceSelect').value;
-            console.log(interface);
 
             var labelValuesMap = {};
             labelValuesMap['IpcMsg'] = selectedMsg;
@@ -166,15 +184,13 @@
                     if (xhr.status === 200) {
                         var xmlContent = xhr.responseText;
                         document.getElementById('textBox').value = xmlContent;
-                        console.log('XML Content : ', xmlContent);
+                        document.getElementById('textBox').innerText = xmlContent;
                     } else {
                         console.error('Failed to read XML. Status : ', xhr.status);
                     }
                 }
             };
-
             xhr.send();
-            document.getElementById('textBox').innerText = xmlContent;
         };
     </script>
 
@@ -226,27 +242,145 @@
                 // Add labels for each element in matchingValue
                 matchingValue.forEach(function(element, index) {
 
-                // Create a new div to contain label and TextBox
-                var containerDiv = document.createElement("div");
+                    // Create a new div to contain label and TextBox
+                    var containerDiv = document.createElement("div");
 
-                // Create label
-                var label = document.createElement("label");
-                label.textContent = element;
-                label.style.display = "block";
+                    // Create label
+                    var label = document.createElement("label");
+                    label.textContent = element;
+                    label.style.display = "block";
 
-                // Create TextBox
-                var textBox = document.createElement("input");
-                textBox.type = "text";
-                textBox.value = "";
+                    // Create TextBox
+                    var textBox = document.createElement("input");
+                    textBox.type = "text";
+                    textBox.value = "";
 
-                // Append label and TextBox to the container div
-                containerDiv.appendChild(label);
-                containerDiv.appendChild(textBox);
+                    // Append label and TextBox to the container div
+                    containerDiv.appendChild(label);
+                    containerDiv.appendChild(textBox);
 
-                document.getElementById('labelContainer').appendChild(containerDiv);
-            });
+                    document.getElementById('labelContainer').appendChild(containerDiv);
+                });
         }
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 추가 버튼 클릭 시 이벤트 처리
+            var addFieldButton = document.getElementById("addFieldButton");
+            addFieldButton.addEventListener("click", function () {
+                var requesterSelect = document.getElementById('requesterSelect');
+                if (requesterSelect.value != 'SCRIPT') {
+                    console.log('Only can add Field / Check Box when chosen SCRIPT');
+                    return;
+                }
+                // 현재 labelContainer에 있는 텍스트 박스의 개수 확인
+                var textBoxCount = document.querySelectorAll("#scriptFieldContainer input").length;
+
+                if (textBoxCount === 5) {
+                    console.error("Maximum Script Field Parameter");
+                    return;
+                }
+
+                // 새로운 레이블 및 텍스트 박스 추가
+                var labelText = "PARAM" + (textBoxCount + 1);
+                var label = document.createElement("label");
+                label.textContent = labelText;
+
+                var textBox = document.createElement("input");
+                textBox.type = "text";
+                textBox.className = "form-control mb-2";
+                textBox.placeholder = labelText;
+
+                var labelContainer = document.getElementById("scriptFieldContainer");
+                labelContainer.appendChild(label);
+                labelContainer.appendChild(textBox);
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 삭제 버튼 클릭 시 이벤트 처리
+            var delFieldButton = document.getElementById("delFieldButton");
+            delFieldButton.addEventListener("click", function () {
+                // 현재 labelContainer에 있는 텍스트 박스의 개수 확인
+                var textBoxCount = document.querySelectorAll("#scriptFieldContainer input").length;
+
+                // 마지막으로 추가된 label과 textBox 찾아서 삭제
+                var labelContainer = document.getElementById("scriptFieldContainer");
+                var lastLabel = labelContainer.lastElementChild;
+                var lastTextBox = labelContainer.lastElementChild.previousElementSibling;
+
+                if (lastLabel && lastTextBox) {
+                    labelContainer.removeChild(lastLabel);
+                    labelContainer.removeChild(lastTextBox);
+                } else {
+                    console.error("No elements to delete");
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var interfaceSelect = document.getElementById('interfaceSelect');
+            if (interfaceSelect.value != 'SCRIPT') {
+                console.log('Only can add Field / Check Box when chosen SCRIPT');
+                return;
+            }
+
+            // 추가 버튼 클릭 시 이벤트 처리
+            var addCheckButton = document.getElementById("addCheckButton");
+            addCheckButton.addEventListener("click", function () {
+            // 현재 labelContainer에 있는 텍스트 박스의 개수 확인
+            var textBoxCount = document.querySelectorAll("#scriptCheckContainer input").length;
+
+            if (textBoxCount === 5) {
+                console.error("Maximum Script Check Parameter");
+                return;
+            }
+
+            // 새로운 레이블 및 텍스트 박스 추가
+            var labelText = "PARAM" + (textBoxCount + 1);
+            var label = document.createElement("label");
+            label.textContent = labelText;
+
+            var textBox = document.createElement("input");
+            textBox.type = "text";
+            textBox.className = "form-control mb-2";
+            textBox.placeholder = labelText;
+
+            var labelContainer = document.getElementById("scriptCheckContainer");
+            labelContainer.appendChild(label);
+            labelContainer.appendChild(textBox);
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 삭제 버튼 클릭 시 이벤트 처리
+            var delCheckButton = document.getElementById("delCheckButton");
+            delCheckButton.addEventListener("click", function () {
+                // 현재 labelContainer에 있는 텍스트 박스의 개수 확인
+                var textBoxCount = document.querySelectorAll("#scriptCheckContainer input").length;
+
+                // 마지막으로 추가된 label과 textBox 찾아서 삭제
+                var labelContainer = document.getElementById("scriptCheckContainer");
+                var lastLabel = labelContainer.lastElementChild;
+                var lastTextBox = labelContainer.lastElementChild.previousElementSibling;
+
+                if (lastLabel && lastTextBox) {
+                    labelContainer.removeChild(lastLabel);
+                    labelContainer.removeChild(lastTextBox);
+                } else {
+                    console.error("No elements to delete");
+                }
+            });
+        });
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
