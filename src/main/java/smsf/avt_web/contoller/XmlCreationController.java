@@ -191,6 +191,10 @@ public class XmlCreationController {
             flow.setRequester(data.get("Requester"));
             flow.setInterfaceName(data.get("Interface"));
 
+            if (data.get("Requester").equals("SCRIPT") || data.get("Interface").equals("SCRIPT")) {
+
+            }
+
             String keyTmp[] = data.keySet().toArray(new String[0]);
             String valueTmp[] = data.values().toArray(new String[0]);
 
