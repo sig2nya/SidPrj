@@ -169,7 +169,6 @@ public class XmlCreationController {
     public static String createScen(@RequestBody Map<String, String> data, HttpSession session) {
         String xmlPath = (String) session.getAttribute("filePath");
         File xmlFile = new File(xmlPath);
-        int scriptIdx = 0;
 
         try {
             Unmarshaller unmarshaller = context.createUnmarshaller();
@@ -197,11 +196,6 @@ public class XmlCreationController {
 
             if (data.get("IpcMsg").contains("_RES")) {
                 for (int i = 3; i < keyTmp.length; i++) {
-                    if (data.get("ScriptInput").equals("0")) {
-                        scriptIdx = i;
-                        break;
-                    }
-
                     Check check = new Check();
                     int id = keyTmp.length - 3;
                     check.setName(keyTmp[i]);
@@ -219,11 +213,78 @@ public class XmlCreationController {
 
             } else if (data.get("IpcMsg").contains("_REQ")){
                 for (int i = 3; i < keyTmp.length; i++) {
-                    if (data.get("ScriptInput").equals("0")) {
-                        scriptIdx = i;
-                        break;
-                    }
+                    Field field = new Field();
+                    field.setName(keyTmp[i]);
+                    field.setValue(valueTmp[i]);
+                    fieldlist.add(field);
+                }
 
+                fieldList.setFields(fieldlist);
+                flow.setFieldList(fieldList);
+                tmpFlowList.add(flow);
+                flowList.setFlows(tmpFlowList);
+                scene.setFlowList(flowList);
+
+            } else {
+                System.out.println("Invalid IPC MSG!!!");
+            }
+
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(scene, xmlFile);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+        return "genAvt/genScen";
+    }
+
+    @PostMapping("/genScript")
+    public static String genScript(@RequestBody Map<String, String> data, HttpSession session) {
+        String xmlPath = (String) session.getAttribute("filePath");
+        File xmlFile = new File(xmlPath);
+
+        try {
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            Marshaller marshaller = context.createMarshaller();
+
+            Scene scene = (Scene) unmarshaller.unmarshal(xmlFile);
+            FlowList flowList = scene.getFlow_list();
+            Flow flow = new Flow();
+
+            FieldList fieldList = new FieldList();
+            CheckList checkList = new CheckList();
+
+            List<Field> fieldlist = new ArrayList<>();
+            List<Check> checklist = new ArrayList<>();
+
+            List<Flow> tmpFlowList = flowList.getFlows();
+
+            flow.setId(tmpFlowList.size() + 1);
+            flow.setMessage(data.get("IpcMsg"));
+            flow.setRequester(data.get("Requester"));
+            flow.setInterfaceName(data.get("Interface"));
+
+            String keyTmp[] = data.keySet().toArray(new String[0]);
+            String valueTmp[] = data.values().toArray(new String[0]);
+
+            if (data.get("IpcMsg").contains("_RES")) {
+                for (int i = 3; i < keyTmp.length; i++) {
+                    Check check = new Check();
+                    int id = keyTmp.length - 3;
+                    check.setName(keyTmp[i]);
+                    check.setId(id++);
+                    check.setEnable(1);
+                    check.setValue(valueTmp[i]);
+                    checklist.add(check);
+                }
+
+                checkList.setChecks(checklist);
+                flow.setCheckList(checkList);
+                tmpFlowList.add(flow);
+                flowList.setFlows(tmpFlowList);
+                scene.setCheck_list(checkList);
+
+            } else if (data.get("IpcMsg").contains("_REQ")){
+                for (int i = 3; i < keyTmp.length; i++) {
                     Field field = new Field();
                     field.setName(keyTmp[i]);
                     field.setValue(valueTmp[i]);

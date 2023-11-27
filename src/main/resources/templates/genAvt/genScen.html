@@ -123,13 +123,15 @@
             var textBoxes = containerDiv.querySelectorAll('input[type="text"]');
 
             var scriptContainerDiv = document.getElementById('scriptContainer');
-            var script = scriptContainerDiv.querySelectorAll('input[type="text"]');
+            var scriptValue = scriptContainerDiv.querySelectorAll('input[type="text"]');
 
             var selectedMsg = document.getElementById('ipcSelect').value;
             var requester = document.getElementById('requesterSelect').value;
             var interface = document.getElementById('interfaceSelect').value;
+            var script = document.getElementById('scriptSelect').value;
 
             var labelValuesMap = {};
+            var scriptValueMap = {};
 
             labelValuesMap['IpcMsg'] = selectedMsg;
             labelValuesMap['Requester'] = requester;
@@ -140,13 +142,6 @@
                 labelValuesMap[label] = textBox.value;
             });
 
-            labelValuesMap['ScriptInput'] = '0';
-
-            script.forEach(function(textBox) {
-                var label = textBox.previousElementSibling.textContent.trim();
-                labelValuesMap[label] = textBox.value;
-                labelValuesMap['ScriptInput'] = '1';
-            });
 
             var xhr = new XMLHttpRequest();
             var url = '/genScen';
@@ -162,6 +157,30 @@
 
             var data = JSON.stringify(labelValuesMap);
             xhr.send(data);
+
+            if (!document.getElementById('typeScript').checked) {
+                if (script !
+                scriptValueMap['Interface'] = interface;
+
+                scriptValue.forEach(function(textBox) {
+                    var label = textBox.previousElementSibling.textContent.trim();
+                    scriptValueMap[label] = textBox.value;
+                });
+                console.log('Script Send' + scriptValueMap);
+
+                url = '/genScript';
+                xhr.open('POST', url, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        console.log('Script Data Sent successfully : ', labelValuesMap);
+                    }
+                };
+
+                data = JSON.stringify(scriptValueMap);
+                xhr.send(data);
+            }
 
             readXml();
         }
