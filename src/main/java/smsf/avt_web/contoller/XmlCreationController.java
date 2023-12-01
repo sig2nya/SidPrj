@@ -58,7 +58,7 @@ public class XmlCreationController {
         try {
             return JAXBContext.newInstance(Scene.class);
         } catch (JAXBException e) {
-            e.printStackTrace();;
+            e.printStackTrace();
             throw new RuntimeException("Failed to initialize JAXBContext");
         }
     }
@@ -231,9 +231,11 @@ public class XmlCreationController {
 
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             marshaller.marshal(scene, xmlFile);
+            session.setAttribute("scene", scene);
         } catch (JAXBException e) {
             e.printStackTrace();
         }
+
         return "genAvt/genScen";
     }
 
@@ -242,68 +244,34 @@ public class XmlCreationController {
         String xmlPath = (String) session.getAttribute("filePath");
         File xmlFile = new File(xmlPath);
 
+        for (String key : data.keySet()) {
+            System.out.println("KEY : " + key);
+        }
+
+        for (String value : data.values()) {
+            System.out.println("VALUE : " + value);
+        }
+
         try {
             Unmarshaller unmarshaller = context.createUnmarshaller();
+
+            Scene scene = (Scene) unmarshaller.unmarshal(new File(xmlPath));
+
+            Check check = new Check();
+            check.setName("Script");
+            check.setValue(data.get("Script"));
+            check.setParamNum(data.size() - 5);
+            check.setResult(data.get("RESULT"));
+
+            List<Flow> flowList = scene.getFlow_list().getFlows();
+            Flow lastFlow = flowList.get(flowList.size() - 1);
+
+            lastFlow.getCheckList().getChecks().add(check);
+
             Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
-            Scene scene = (Scene) unmarshaller.unmarshal(xmlFile);
-            FlowList flowList = scene.getFlow_list();
-            Flow flow = new Flow();
-
-            FieldList fieldList = new FieldList();
-            CheckList checkList = new CheckList();
-
-            List<Field> fieldlist = new ArrayList<>();
-            List<Check> checklist = new ArrayList<>();
-
-            List<Flow> tmpFlowList = flowList.getFlows();
-
-            flow.setId(tmpFlowList.size() + 1);
-            flow.setMessage(data.get("IpcMsg"));
-            flow.setRequester(data.get("Requester"));
-            flow.setInterfaceName(data.get("Interface"));
-
-            String keyTmp[] = data.keySet().toArray(new String[0]);
-            String valueTmp[] = data.values().toArray(new String[0]);
-
-            if (data.get("IpcMsg").contains("_RES")) {
-                for (int i = 3; i < keyTmp.length; i++) {
-                    Check check = new Check();
-                    int id = keyTmp.length - 3;
-                    check.setName(keyTmp[i]);
-                    check.setId(id++);
-                    check.setEnable(1);
-                    check.setValue(valueTmp[i]);
-                    checklist.add(check);
-                }
-
-                checkList.setChecks(checklist);
-                flow.setCheckList(checkList);
-                tmpFlowList.add(flow);
-                flowList.setFlows(tmpFlowList);
-                scene.setCheck_list(checkList);
-
-            } else if (data.get("IpcMsg").contains("_REQ")){
-                for (int i = 3; i < keyTmp.length; i++) {
-                    Field field = new Field();
-                    field.setName(keyTmp[i]);
-                    field.setValue(valueTmp[i]);
-                    fieldlist.add(field);
-                }
-
-                fieldList.setFields(fieldlist);
-                flow.setFieldList(fieldList);
-                tmpFlowList.add(flow);
-                flowList.setFlows(tmpFlowList);
-                scene.setFlowList(flowList);
-
-            } else {
-                System.out.println("Invalid IPC MSG!!!");
-            }
-
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.marshal(scene, xmlFile);
-        } catch (JAXBException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return "genAvt/genScen";

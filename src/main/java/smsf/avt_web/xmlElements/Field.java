@@ -7,18 +7,8 @@ import jakarta.xml.bind.annotation.XmlValue;
 
 @XmlRootElement(name = "Field")
 public class Field {
-    private int id;
     private String name;
     private String value;
-
-    @XmlAttribute(name = "ID")
-    public int getId() {
-        return id;
-    }
-
-    public void setName(int id) {
-        this.id = id;
-    }
 
 
     @XmlAttribute(name = "NAME")

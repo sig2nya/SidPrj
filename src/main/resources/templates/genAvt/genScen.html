@@ -119,6 +119,8 @@
 
     <script th:inline="javascript">
         function addNode() {
+            readXml();
+
             var containerDiv = document.getElementById('labelContainer');
             var textBoxes = containerDiv.querySelectorAll('input[type="text"]');
 
@@ -159,14 +161,19 @@
             xhr.send(data);
 
             if (!document.getElementById('typeScript').checked) {
-                if (script !
+                if (script === 'NONE') {
+                    return;
+                }
+
+                scriptValueMap['IpcMsg'] = selectedMsg;
+                scriptValueMap['Script'] = script;
+                scriptValueMap['Requester'] = requester;
                 scriptValueMap['Interface'] = interface;
 
                 scriptValue.forEach(function(textBox) {
                     var label = textBox.previousElementSibling.textContent.trim();
                     scriptValueMap[label] = textBox.value;
                 });
-                console.log('Script Send' + scriptValueMap);
 
                 url = '/genScript';
                 xhr.open('POST', url, true);
@@ -181,8 +188,6 @@
                 data = JSON.stringify(scriptValueMap);
                 xhr.send(data);
             }
-
-            readXml();
         }
     </script>
 
@@ -304,6 +309,20 @@
 
                     document.getElementById('scriptContainer').appendChild(containerDiv);
                 });
+
+                var containerDiv = document.createElement("div");
+
+                var label = document.createElement("label");
+                label.textContent = "RESULT";
+
+                var textBox = document.createElement("input");
+                textBox.type = "text";
+                textBox.value = "";
+
+                containerDiv.appendChild(label);
+                containerDiv.appendChild(textBox);
+
+                document.getElementById('scriptContainer').appendChild(containerDiv);
         }
     </script>
 
