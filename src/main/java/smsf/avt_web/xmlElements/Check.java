@@ -1,9 +1,9 @@
 package smsf.avt_web.xmlElements;
 
+import com.sun.xml.txw2.annotation.XmlValue;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlValue;
 
 import java.util.List;
 
@@ -16,7 +16,6 @@ public class Check {
 
     private String result;
 
-    @XmlElement(name = "Param")
     private List<Param> paramList;
 
     private String value;
@@ -65,14 +64,6 @@ public class Check {
         this.result = result;
     }
 
-    public List<Param> getParamList() {
-        return paramList;
-    }
-
-    public void setParamList(List<Param> paramList) {
-        this.paramList = paramList;
-    }
-
     @XmlValue
     public String getValue() {
         return value;
@@ -80,5 +71,14 @@ public class Check {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @XmlElement(name = "Param")
+    public List<Param> getParamList() {
+        return paramList;
+    }
+
+    public void setParamList(List<Param> paramList) {
+        this.paramList = paramList;
     }
 }

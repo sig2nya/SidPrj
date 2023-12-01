@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FlowList {
+//    private List<Flow> flows = new ArrayList<>();
     private List<Flow> flows = new ArrayList<>();
 
     @XmlElement(name = "Flow")

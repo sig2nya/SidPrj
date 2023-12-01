@@ -244,14 +244,6 @@ public class XmlCreationController {
         String xmlPath = (String) session.getAttribute("filePath");
         File xmlFile = new File(xmlPath);
 
-        for (String key : data.keySet()) {
-            System.out.println("KEY : " + key);
-        }
-
-        for (String value : data.values()) {
-            System.out.println("VALUE : " + value);
-        }
-
         try {
             Unmarshaller unmarshaller = context.createUnmarshaller();
 
@@ -264,6 +256,7 @@ public class XmlCreationController {
             check.setResult(data.get("RESULT"));
 
             List<Flow> flowList = scene.getFlow_list().getFlows();
+            System.out.println("FLOW SIZE : " + flowList.size());
             Flow lastFlow = flowList.get(flowList.size() - 1);
 
             lastFlow.getCheckList().getChecks().add(check);
