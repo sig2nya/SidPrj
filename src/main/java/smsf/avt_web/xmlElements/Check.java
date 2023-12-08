@@ -64,7 +64,7 @@ public class Check {
         this.result = result;
     }
 
-    @XmlValue
+    @XmlAttribute(name = "VALUE")
     public String getValue() {
         return value;
     }

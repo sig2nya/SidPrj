@@ -247,22 +247,43 @@ public class XmlCreationController {
         try {
             Unmarshaller unmarshaller = context.createUnmarshaller();
 
-            Scene scene = (Scene) unmarshaller.unmarshal(new File(xmlPath));
+            Scene scene = (Scene) unmarshaller.unmarshal(xmlFile);
 
             Check check = new Check();
             check.setName("Script");
             check.setValue(data.get("Script"));
-            check.setParamNum(data.size() - 5);
-            check.setResult(data.get("RESULT"));
+            check.setEnable(1);
+            check.setParamNum(data.size() - 4);
+            check.setParamList(new ArrayList<>(data.size() - 4));
+
+            String valueTmp[] = data.values().toArray(new String[0]);
+
+            for (int i = 4; i < valueTmp.length; i++) {
+                Param param = new Param();
+                param.setId(i - 3);
+                param.setValue(valueTmp[i]);
+                check.getParamList().add(param);
+            }
 
             List<Flow> flowList = scene.getFlow_list().getFlows();
-            System.out.println("FLOW SIZE : " + flowList.size());
-            Flow lastFlow = flowList.get(flowList.size() - 1);
+            Flow flow = new Flow();
 
-            lastFlow.getCheckList().getChecks().add(check);
+            List<Flow> tmpFlow = scene.getFlow_list().getFlows();
+
+            flow.setId(flowList.size() + 1);
+            flow.setMessage(data.get("IpcMsg"));
+            flow.setRequester(data.get("Requester"));
+            flow.setInterfaceName(data.get("Interface"));
+            flow.setCheckList(new CheckList());
+            flow.getCheckList().setChecks(new ArrayList<Check>());
+            flow.getCheckList().getChecks().add(check);
+
+            tmpFlow.add(flow);
+            scene.getFlow_list().setFlows(tmpFlow);
 
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.marshal(scene, xmlFile);
 
         } catch (Exception e) {
             e.printStackTrace();

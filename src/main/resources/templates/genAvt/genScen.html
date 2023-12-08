@@ -119,8 +119,6 @@
 
     <script th:inline="javascript">
         function addNode() {
-            readXml();
-
             var containerDiv = document.getElementById('labelContainer');
             var textBoxes = containerDiv.querySelectorAll('input[type="text"]');
 
@@ -144,7 +142,6 @@
                 labelValuesMap[label] = textBox.value;
             });
 
-
             var xhr = new XMLHttpRequest();
             var url = '/genScen';
 
@@ -158,7 +155,9 @@
             };
 
             var data = JSON.stringify(labelValuesMap);
-            xhr.send(data);
+            if (labelValuesMap['IpcMsg'] != 'NONE') {
+                xhr.send(data);
+            }
 
             if (!document.getElementById('typeScript').checked) {
                 if (script === 'NONE') {
@@ -188,6 +187,7 @@
                 data = JSON.stringify(scriptValueMap);
                 xhr.send(data);
             }
+            readXml();
         }
     </script>
 

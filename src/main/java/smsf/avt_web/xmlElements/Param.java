@@ -1,12 +1,14 @@
 package smsf.avt_web.xmlElements;
 
+import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlValue;
 
 public class Param {
     private int id;
     private String value;
 
-    @XmlElement(name = "ID")
+    @XmlAttribute(name = "ID")
     public int getId() {
         return id;
     }
@@ -15,7 +17,7 @@ public class Param {
         this.id = id;
     }
 
-    @XmlElement(name = "value")
+    @XmlValue
     public String getValue() {
         return value;
     }
